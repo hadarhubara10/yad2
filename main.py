@@ -150,4 +150,3 @@ async def _callbacks(client, cb: CallbackQuery):
 
 app.run()
 
-test = 'test'
