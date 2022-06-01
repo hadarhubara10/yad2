@@ -11,10 +11,11 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from yad2_get_details import get_yad2_content,  getFilteredUrl
 from get_code_of_manufacturer import get_code_of_manufacturer
+from methods import check_if_clicked, make_unclicked, edit_filtered_message
 # Configs
-API_HASH = '9f1fd643fa73d4320b22d7643ce0d60b'
-APP_ID = 1188591
-BOT_TOKEN = '5304180723:AAGpJBhAq8NcvLleTqaaorMKYIwkNIXgOdg'
+API_HASH = os.getenv('API_HASH')
+APP_ID = os.getenv('APP_ID')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 # Buttons
 START_BUTTONS = [
     [
@@ -119,29 +120,37 @@ async def _callbacks(client, cb: CallbackQuery):
     if cb.data == 'manufacturer':
         await cb.message.edit_text("בבקשה בחר את היצרנים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(MANUFACTURER_BUTTONS))
     if cb.data == 'manufacturer_done':
-        if not "✅" in CAR_SCAN_FILTERS_BUTTONS[0][0].text:
-            CAR_SCAN_FILTERS_BUTTONS[0][0] = InlineKeyboardButton(
-                CAR_SCAN_FILTERS_BUTTONS[0][0].text + "✅", callback_data='manufacturer')
-        await cb.message.edit_text("בחר מסננים נוספים, עד כה בחרת \n"+CAR_SCAN_FILTERS_BUTTONS[0][0].text, reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
-        print(getFilteredUrl(user_choices))
+        if not len(user_choices["manufacturer"]) == 0:
+            CAR_SCAN_FILTERS_BUTTONS[0][0] = check_if_clicked(
+                cb.data, CAR_SCAN_FILTERS_BUTTONS[0][0], 'manufacturer')
+        else:
+            CAR_SCAN_FILTERS_BUTTONS[0][0] = make_unclicked(
+                cb.data, CAR_SCAN_FILTERS_BUTTONS[0][0], 'manufacturer')
+
+        # await cb.message.edit_text("בחר מסננים נוספים, עד כה בחרת \n"+CAR_SCAN_FILTERS_BUTTONS[0][0].text.removesuffix("✅"), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
+        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
+
     # check if user has chosen manufacturers and append them to user_choices
     if not cb.data == 'manufacturer_done':
         for i in range(len(MANUFACTURER_BUTTONS)):
-            # Check if user has chosen a manufacturer button
-            # if any(cb.data == s.callback_data for s in MANUFACTURER_BUTTONS[i]):
             for index, s in enumerate(MANUFACTURER_BUTTONS[i]):
                 if cb.data == s.callback_data:
-                    print(cb.data)
 
-                    if not get_code_of_manufacturer(cb.data) in user_choices["manufacturer"] and len(user_choices["manufacturer"]) < 4:
-                        user_choices["manufacturer"].append(
+                    if not get_code_of_manufacturer(cb.data) in user_choices["manufacturer"]:
+                        if len(user_choices["manufacturer"]) < 4:
+                            user_choices["manufacturer"].append(
+                                get_code_of_manufacturer(cb.data))
+                            MANUFACTURER_BUTTONS[i][index] = check_if_clicked(
+                                s, MANUFACTURER_BUTTONS[i][index], cb.data)
+                            print(user_choices)
+                    elif get_code_of_manufacturer(cb.data) in user_choices["manufacturer"]:
+                        user_choices["manufacturer"].remove(
                             get_code_of_manufacturer(cb.data))
-                        print(MANUFACTURER_BUTTONS[i][index])
-                        if not "✅" in s.text:
-                            MANUFACTURER_BUTTONS[i][index] = InlineKeyboardButton(
-                                s.text + "✅", callback_data=cb.data)
-                        await cb.message.edit_text("בבקשה בחר את היצרנים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(MANUFACTURER_BUTTONS))
-                print(user_choices)
+                        MANUFACTURER_BUTTONS[i][index] = make_unclicked(
+                            s, MANUFACTURER_BUTTONS[i][index], cb.data)
+                        print(user_choices)
+
+                    await cb.message.edit_text("בבקשה בחר את היצרנים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(MANUFACTURER_BUTTONS))
 
     if cb.data == 'scan':
         await cb.message.edit_text("מצאת את הרכב שלך בחיפוש הרכבים ביד 2😊", reply_markup=InlineKeyboardMarkup(START_BUTTONS))
@@ -149,4 +158,3 @@ async def _callbacks(client, cb: CallbackQuery):
 
 
 app.run()
-
