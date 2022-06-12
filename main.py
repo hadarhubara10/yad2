@@ -10,7 +10,7 @@ from typing import Tuple
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from yad2_get_details import get_yad2_content,  getFilteredUrl
-from get_code_of_manufacturer import get_code_of_engine_type, get_code_of_manufacturer,get_code_of_owner,get_engine_type_json,get_code_of_seats,get_code_of_gear_box,get_code_of_colors,get_code_of_hand
+from get_code_of_manufacturer import get_code_of_engine_type, get_code_of_manufacturer, get_code_of_owner, get_engine_type_json, get_code_of_seats, get_code_of_gear_box, get_code_of_colors, get_code_of_hand
 from methods import check_if_clicked, make_unclicked, edit_filtered_message
 from pyrogram.types import Message
 from pyrogram.errors import PeerFlood
@@ -69,12 +69,12 @@ CAR_SCAN_FILTERS_BUTTONS = [
      InlineKeyboardButton('תפריט ראשי', callback_data='backtomain')],
 ]
 OWNERS_BUTTONS = [
-     [
+    [
         InlineKeyboardButton('פרטית', callback_data='פרטית'),
         InlineKeyboardButton('חברה', callback_data='חברה'),
         InlineKeyboardButton('ליסינג', callback_data='ליסינג'),
     ],
-     [
+    [
         InlineKeyboardButton('השכרה', callback_data='השכרה'),
         InlineKeyboardButton('מונית', callback_data='מונית'),
         InlineKeyboardButton('ייבוא אישי', callback_data='ייבוא אישי'),
@@ -86,15 +86,17 @@ OWNERS_BUTTONS = [
 
 ]
 ENGINE_TYPE_BUTTONS = [
-     [
+    [
         InlineKeyboardButton('בנזין', callback_data='בנזין'),
         InlineKeyboardButton('דיזל', callback_data='דיזל'),
         InlineKeyboardButton('חשמלי', callback_data='חשמלי'),
     ],
-     [
+    [
         InlineKeyboardButton('טורבו דיזל', callback_data='טורבו דיזל'),
-        InlineKeyboardButton('היברידי חשמל / בנזין', callback_data='היברידי חשמל / בנזין'),
-        InlineKeyboardButton('היברידי חשמל / דיזל', callback_data='היברידי חשמל / דיזל'),
+        InlineKeyboardButton('היברידי חשמל / בנזין',
+                             callback_data='היברידי חשמל / בנזין'),
+        InlineKeyboardButton('היברידי חשמל / דיזל',
+                             callback_data='היברידי חשמל / דיזל'),
     ],
     [
         InlineKeyboardButton(
@@ -214,22 +216,24 @@ HAND_BUTTONS = [
     ],
 ]
 FAVORITES_BUTTONS = [
-        InlineKeyboardButton('תפריט ראשי', callback_data='backtomain'),
-    ],
+    InlineKeyboardButton('תפריט ראשי', callback_data='backtomain'),
+],
 # Running bot
 app = Client('Yad2Testbot', api_id=APP_ID,
              api_hash=API_HASH, bot_token=BOT_TOKEN)
 user_choices = {
     "manufacturer": [],
     "owners": [],
-    "engine_type" : [],
-    "seats" : [],
-    "gearBox" : [],
-    "hand" : [],
-    "colors" : []
+    "engine_type": [],
+    "seats": [],
+    "gearBox": [],
+    "hand": [],
+    "colors": []
 }
 
 # Start
+
+
 @app.on_message(filters.command('start') & filters.private)
 async def start(client, message):
     await message.reply_text("היי וברוכים הבאים לבוט שיעזור לכם למצוא מציאות בתחום הרכבים ביד 2😊", reply_markup=InlineKeyboardMarkup(START_BUTTONS))
@@ -240,7 +244,7 @@ async def _callbacks(client, cb: CallbackQuery):
     print(cb.data)
     if cb.data == 'carscanfilters':
         await cb.message.edit_text("כאן תוכל לבחור את המסננים בחיפוש הרכב בו אתה מעוניין ", reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
-        
+
     if cb.data == 'favorites':
         await cb.message.edit_text("כאן יוצגו כל המודעות ששמרת",  reply_markup=InlineKeyboardMarkup(FAVORITES_BUTTONS))
     if cb.data == 'backtomain':
@@ -259,7 +263,7 @@ async def _callbacks(client, cb: CallbackQuery):
         await cb.message.edit_text("בבקשה בחר את הצבעים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(COLORS_BUTTONS))
     if cb.data == 'hand':
         await cb.message.edit_text("בבקשה בחר את היד בה אתה מעוניין", reply_markup=InlineKeyboardMarkup(HAND_BUTTONS))
-   
+
     if cb.data == 'hand_done':
         if not len(user_choices["hand"]) == 0:
             CAR_SCAN_FILTERS_BUTTONS[1][2] = check_if_clicked(
@@ -267,8 +271,8 @@ async def _callbacks(client, cb: CallbackQuery):
         else:
             CAR_SCAN_FILTERS_BUTTONS[1][2] = make_unclicked(
                 cb.data, CAR_SCAN_FILTERS_BUTTONS[1][2], 'hand')
-        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))    
-    if not cb.data =='hand_done': 
+        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
+    if not cb.data == 'hand_done':
         for i in range(len(HAND_BUTTONS)):
             for index, s in enumerate(HAND_BUTTONS[i]):
                 if cb.data == s.callback_data:
@@ -287,7 +291,7 @@ async def _callbacks(client, cb: CallbackQuery):
                             s, HAND_BUTTONS[i][index], cb.data)
                         print(user_choices)
 
-                    await cb.message.edit_text("בבקשה בחר את היד בה אתה מעוניין", reply_markup=InlineKeyboardMarkup(HAND_BUTTONS))  
+                    await cb.message.edit_text("בבקשה בחר את היד בה אתה מעוניין", reply_markup=InlineKeyboardMarkup(HAND_BUTTONS))
     if cb.data == 'colors_done':
         if not len(user_choices["colors"]) == 0:
             CAR_SCAN_FILTERS_BUTTONS[2][2] = check_if_clicked(
@@ -295,8 +299,8 @@ async def _callbacks(client, cb: CallbackQuery):
         else:
             CAR_SCAN_FILTERS_BUTTONS[2][2] = make_unclicked(
                 cb.data, CAR_SCAN_FILTERS_BUTTONS[2][2], 'colors')
-        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))    
-    if not cb.data =='colors_done': 
+        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
+    if not cb.data == 'colors_done':
         for i in range(len(COLORS_BUTTONS)):
             for index, s in enumerate(COLORS_BUTTONS[i]):
                 if cb.data == s.callback_data:
@@ -315,7 +319,7 @@ async def _callbacks(client, cb: CallbackQuery):
                             s, COLORS_BUTTONS[i][index], cb.data)
                         print(user_choices)
 
-                    await cb.message.edit_text("בבקשה בחר את הצבעים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(COLORS_BUTTONS))  
+                    await cb.message.edit_text("בבקשה בחר את הצבעים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(COLORS_BUTTONS))
     if cb.data == 'gear_box_done':
         if not len(user_choices["gearBox"]) == 0:
             CAR_SCAN_FILTERS_BUTTONS[2][1] = check_if_clicked(
@@ -323,8 +327,8 @@ async def _callbacks(client, cb: CallbackQuery):
         else:
             CAR_SCAN_FILTERS_BUTTONS[2][1] = make_unclicked(
                 cb.data, CAR_SCAN_FILTERS_BUTTONS[2][1], 'gear_box')
-        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))    
-    if not cb.data =='gear_box_done': 
+        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
+    if not cb.data == 'gear_box_done':
         for i in range(len(GEAR_BOX_BUTTONS)):
             for index, s in enumerate(GEAR_BOX_BUTTONS[i]):
                 if cb.data == s.callback_data:
@@ -343,7 +347,7 @@ async def _callbacks(client, cb: CallbackQuery):
                             s, GEAR_BOX_BUTTONS[i][index], cb.data)
                         print(user_choices)
 
-                    await cb.message.edit_text("בבקשה בחר את תיבות ההילוכים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(GEAR_BOX_BUTTONS))  
+                    await cb.message.edit_text("בבקשה בחר את תיבות ההילוכים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(GEAR_BOX_BUTTONS))
     if cb.data == 'seats_done':
         if not len(user_choices["seats"]) == 0:
             CAR_SCAN_FILTERS_BUTTONS[3][2] = check_if_clicked(
@@ -351,8 +355,8 @@ async def _callbacks(client, cb: CallbackQuery):
         else:
             CAR_SCAN_FILTERS_BUTTONS[3][2] = make_unclicked(
                 cb.data, CAR_SCAN_FILTERS_BUTTONS[3][2], 'seats')
-        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))    
-    if not cb.data =='seats_done': 
+        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
+    if not cb.data == 'seats_done':
         for i in range(len(SEATS_BUTTONS)):
             for index, s in enumerate(SEATS_BUTTONS[i]):
                 if cb.data == s.callback_data:
@@ -371,7 +375,7 @@ async def _callbacks(client, cb: CallbackQuery):
                             s, SEATS_BUTTONS[i][index], cb.data)
                         print(user_choices)
 
-                    await cb.message.edit_text("בבקשה בחר את סוגי המנועים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(SEATS_BUTTONS))  
+                    await cb.message.edit_text("בבקשה בחר את סוגי המנועים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(SEATS_BUTTONS))
     if cb.data == 'engine_type_done':
         if not len(user_choices["engine_type"]) == 0:
             CAR_SCAN_FILTERS_BUTTONS[3][1] = check_if_clicked(
@@ -379,8 +383,8 @@ async def _callbacks(client, cb: CallbackQuery):
         else:
             CAR_SCAN_FILTERS_BUTTONS[3][1] = make_unclicked(
                 cb.data, CAR_SCAN_FILTERS_BUTTONS[3][1], 'engine_type')
-        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))    
-    if not cb.data =='engine_type_done': 
+        await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
+    if not cb.data == 'engine_type_done':
         for i in range(len(ENGINE_TYPE_BUTTONS)):
             for index, s in enumerate(ENGINE_TYPE_BUTTONS[i]):
                 if cb.data == s.callback_data:
@@ -399,7 +403,7 @@ async def _callbacks(client, cb: CallbackQuery):
                             s, ENGINE_TYPE_BUTTONS[i][index], cb.data)
                         print(user_choices)
 
-                    await cb.message.edit_text("בבקשה בחר את סוגי המנועים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(ENGINE_TYPE_BUTTONS))    
+                    await cb.message.edit_text("בבקשה בחר את סוגי המנועים בהם אתה מעוניין", reply_markup=InlineKeyboardMarkup(ENGINE_TYPE_BUTTONS))
     if cb.data == 'ownership_done':
         if not len(user_choices["owners"]) == 0:
             CAR_SCAN_FILTERS_BUTTONS[3][0] = check_if_clicked(
@@ -408,7 +412,7 @@ async def _callbacks(client, cb: CallbackQuery):
             CAR_SCAN_FILTERS_BUTTONS[3][0] = make_unclicked(
                 cb.data, CAR_SCAN_FILTERS_BUTTONS[3][0], 'owners')
         await cb.message.edit_text(edit_filtered_message(user_choices), reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
-    if not cb.data =='ownership_done': 
+    if not cb.data == 'ownership_done':
         for i in range(len(OWNERS_BUTTONS)):
             for index, s in enumerate(OWNERS_BUTTONS[i]):
                 if cb.data == s.callback_data:
