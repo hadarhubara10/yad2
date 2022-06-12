@@ -240,7 +240,7 @@ async def _callbacks(client, cb: CallbackQuery):
     print(cb.data)
     if cb.data == 'carscanfilters':
         await cb.message.edit_text("כאן תוכל לבחור את המסננים בחיפוש הרכב בו אתה מעוניין ", reply_markup=InlineKeyboardMarkup(CAR_SCAN_FILTERS_BUTTONS))
-        
+        #asdasd
     if cb.data == 'favorites':
         await cb.message.edit_text("כאן יוצגו כל המודעות ששמרת",  reply_markup=InlineKeyboardMarkup(FAVORITES_BUTTONS))
     if cb.data == 'backtomain':
