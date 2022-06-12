@@ -7,8 +7,14 @@ def get_manufacturer_json():
         return data['manufacturer']
 
 
-json_manufacturer = get_manufacturer_json()
+def get_owners_json():
+    with open('owners.json', 'r', encoding="utf8") as f:
+        data = json.load(f)
+        return data['ownerID']
 
+
+json_manufacturer = get_manufacturer_json()
+json_owners = get_owners_json()
 # Get array of manufacturers code #
 
 # def get_code_of_manufacturer(manufacturers):
@@ -28,6 +34,12 @@ json_manufacturer = get_manufacturer_json()
 def get_code_of_manufacturer(manufacturer):
     for item in json_manufacturer:
         if item["text"] == manufacturer:
+            return item["value"]
+
+
+def get_code_of_owner(owners):
+    for item in json_owners:
+        if item["text"] == owners:
             return item["value"]
 
 
